@@ -7,7 +7,6 @@
 
 # Colors
 RED='\033[0;31m'
-GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
@@ -92,8 +91,10 @@ check_llm() {
     fi
 
     # Get models list
-    local models_json=$(curl -s "$LLM_URL/models" 2>/dev/null)
-    local models=$(echo "$models_json" | sed 's/"id":/\n/g' | grep -v '^$' | sed 's/.*"\([^"]*\)".*/\1/' | grep -v '^data' | tr '\n' ' ')
+    local models_json
+    models_json=$(curl -s "$LLM_URL/models" 2>/dev/null)
+    local models
+    models=$(echo "$models_json" | sed 's/"id":/\n/g' | grep -v '^$' | sed 's/.*"\([^"]*\)".*/\1/' | grep -v '^data' | tr '\n' ' ')
     log INFO "Available models: $models"
 
     # Check if any model is loaded (use first available)

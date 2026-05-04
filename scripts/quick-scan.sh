@@ -20,7 +20,7 @@ DEBUG="${DEBUG:-0}"
 # Paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-PATTERNS_FILE="$PROJECT_DIR/config/patterns.yaml"
+
 LOG_DIR="$PROJECT_DIR/logs"
 LOG_FILE="$LOG_DIR/quick-scan.log"
 
@@ -36,7 +36,8 @@ EXCLUDE_DIRS="${EXCLUDE_DIRS:-node_modules|.venv|venv|dist|build|.git}"
 log() {
     local level="$1"
     local message="$2"
-    local timestamp=$(date '+%Y-%m-%d %H:%M:%S')
+    local timestamp
+    timestamp=$(date '+%Y-%m-%d %H:%M:%S')
 
     case "$level" in
         ERROR)   echo -e "${RED}[ERROR]${NC} $message" ;;
@@ -128,7 +129,8 @@ scan_file() {
     local warnings=0
 
     # Check file size
-    local file_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo 0)
+    local file_size
+    file_size=$(stat -f%z "$file" 2>/dev/null || stat -c%s "$file" 2>/dev/null || echo 0)
     if [ "$file_size" -gt "$MAX_FILE_SIZE" ]; then
         echo -e "  ${YELLOW}→${NC} Skipped (too large: $((file_size/1024/1024))MB)"
         return 0
