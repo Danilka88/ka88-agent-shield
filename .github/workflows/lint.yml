@@ -13,12 +13,7 @@ jobs:
           wget -qO /tmp/shellcheck.tar.xz https://github.com/koalaman/shellcheck/releases/download/v0.10.0/shellcheck-v0.10.0.linux.x86_64.tar.xz
           mkdir -p /tmp/sc
           tar -xf /tmp/shellcheck.tar.xz -C /tmp/sc
-          ls /tmp/sc
-
-      - name: Find ShellCheck binary
-        run: |
-          find /tmp -name shellcheck -type f
-          sudo cp $(find /tmp -name shellcheck -type f | head -1) /usr/local/bin/
+          sudo cp /tmp/sc/shellcheck-v0.10.0/shellcheck /usr/local/bin/
 
       - name: Run ShellCheck
         run: shellcheck --severity=warning scripts/*.sh
