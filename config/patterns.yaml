@@ -1,4 +1,5 @@
 # ka88-agent-shield - 216 Detection Patterns
+---
 # Based on ClawGuard patterns (https://github.com/joergmichno/clawguard)
 # Categories aligned with OWASP Agentic AI Top 10
 
@@ -47,9 +48,9 @@ categories:
         description: "Request to forget previous context"
         owasp: "ASI01"
 
-      - id: "PI-007"
+- id: "PI-007"
         name: "Do Not Tell User"
-        regex: '(?i)(do\\s+not|don\'t|never)\\s+(tell|inform|show|reveal)\\s+(the\\s+)?user'
+        regex: "(?i)(do\\s+not|don''t|never)\\s+(tell|inform|show|reveal)\\s+(the\\s+)?user"
         description: "Hidden instructions to withhold information"
         owasp: "ASI01"
 

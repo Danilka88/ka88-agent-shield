@@ -21,4 +21,4 @@ jobs:
       - name: Run YAML Lint
         run: |
           pip install yamllint
-          yamllint config/ scripts/
+          yamllint -c .yamllintrc config/

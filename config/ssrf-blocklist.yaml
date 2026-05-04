@@ -1,6 +1,6 @@
 # SSRF Blocklist - Known SSRF-prone endpoints and suspicious domains
 # Used for Pre-Visit Scan (Phase 1)
-
+---
 version: "1.0.0"
 
 categories:

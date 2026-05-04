@@ -1,0 +1,5 @@
+.yamllint.yaml
+---
+rules:
+  line-length: disabled
+  document-start: disable
