@@ -1,10 +1,10 @@
-# Security Auditor Pro
+# ka88-agent-shield
 
 AI एजेंट्स के लिए पेशेवर सुरक्षा ऑडिट।
 
 ## विवरण
 
-Security Auditor Pro AI एजेंट्स के लिए एक स्किल है जो व्यापक सुरक्षा प्रदान करती है:
+ka88-agent-shield AI एजेंट्स के लिए एक स्किल है जो व्यापक सुरक्षा प्रदान करती है:
 - प्रॉम्प्ट इंजेक्शन (Prompt Injection)
 - SSRF हमले
 - क्रेडेंशियल एक्सफिल्ट्रेशन (Credential Exfiltration)

@@ -1,10 +1,10 @@
-# Security Auditor Pro
+# ka88-agent-shield
 
 Профессиональный аудит безопасности для AI агентов.
 
 ## Описание
 
-Security Auditor Pro — это навык (skill) для AI агентов, обеспечивающий комплексную защиту от угроз:
+ka88-agent-shield — это навык (skill) для AI агентов, обеспечивающий комплексную защиту от угроз:
 - Prompt Injection (внедрение промптов)
 - SSRF атаки
 - Credential Exfiltration (утечка учетных данных)

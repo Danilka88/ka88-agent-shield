@@ -1,10 +1,10 @@
-# Security Auditor Pro
+# ka88-agent-shield
 
 Auditoria de segurança profissional para agentes de IA.
 
 ## Descrição
 
-Security Auditor Pro é uma habilidade para agentes de IA que fornece proteção abrangente contra:
+ka88-agent-shield é uma habilidade para agentes de IA que fornece proteção abrangente contra:
 - Injeção de Prompts (Prompt Injection)
 - Ataques SSRF
 - Exfiltração de Credenciais

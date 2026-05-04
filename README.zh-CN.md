@@ -1,10 +1,10 @@
-# Security Auditor Pro
+# ka88-agent-shield
 
 AI 代理专业安全审计工具。
 
 ## 描述
 
-Security Auditor Pro 是面向 AI 代理的技能，提供全面保护：
+ka88-agent-shield 是面向 AI 代理的技能，提供全面保护：
 - 提示词注入 (Prompt Injection)
 - SSRF 攻击
 - 凭证泄露 (Credential Exfiltration)
