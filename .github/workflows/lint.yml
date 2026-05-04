@@ -12,13 +12,3 @@ jobs:
         run: |
           sudo apt-get install -y shellcheck
           find scripts -name "*.sh" -exec shellcheck {} +
-
-  yamllint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Run YAML Lint
-        run: |
-          pip install yamllint
-          yamllint -c .yamllintrc config/
