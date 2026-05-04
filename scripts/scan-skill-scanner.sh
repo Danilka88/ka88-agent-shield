@@ -21,9 +21,25 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 VENV_PATH="${VENV_PATH:-$PROJECT_DIR/.venv}"
 
-# LM Studio settings
+# LLM Provider: "lm-studio" or "ollama"
+LLM_PROVIDER="${LLM_PROVIDER:-lm-studio}"
+
+# LM Studio settings (default)
 LM_STUDIO_URL="${LM_STUDIO_URL:-http://localhost:1234/v1}"
 MODEL="${MODEL:-qwen3-35b-a3b}"
+
+# Ollama settings
+OLLAMA_URL="${OLLAMA_URL:-http://localhost:11434/v1}"
+OLLAMA_MODEL="${OLLAMA_MODEL:-llama3.2}"
+
+# Use URL based on provider
+if [ "$LLM_PROVIDER" = "ollama" ]; then
+    LLM_URL="$OLLAMA_URL"
+    LLM_MODEL="$OLLAMA_MODEL"
+else
+    LLM_URL="$LM_STUDIO_URL"
+    LLM_MODEL="$MODEL"
+fi
 
 # Limits
 TIMEOUT_LM_STUDIO="${TIMEOUT_LM_STUDIO:-5}"
@@ -47,29 +63,46 @@ log() {
 }
 
 # ============================================================================
-# CHECK LM STUDIO
+# CHECK LLM (LM Studio or Ollama)
 # ============================================================================
 
-check_lm_studio() {
-    log INFO "Checking LM Studio..."
+check_llm() {
+    if [ "$LLM_PROVIDER" = "ollama" ]; then
+        log INFO "Checking Ollama..."
+        log INFO "URL: $OLLAMA_URL"
+    else
+        log INFO "Checking LM Studio..."
+        log INFO "URL: $LM_STUDIO_URL"
+    fi
 
-    if ! curl -s --connect-timeout "$TIMEOUT_LM_STUDIO" "$LM_STUDIO_URL/models" > /dev/null 2>&1; then
-        log ERROR "LM Studio unavailable: $LM_STUDIO_URL"
-        log ERROR "Make sure:"
-        log ERROR "  1. LM Studio is running"
-        log ERROR "  2. Model is loaded into memory"
-        log ERROR "  3. Server is enabled in Developer tab"
+    if ! curl -s --connect-timeout "$TIMEOUT_LM_STUDIO" "$LLM_URL/models" > /dev/null 2>&1; then
+        if [ "$LLM_PROVIDER" = "ollama" ]; then
+            log ERROR "Ollama unavailable: $OLLAMA_URL"
+            log ERROR "Make sure:"
+            log ERROR "  1. Ollama is running (ollama serve)"
+            log ERROR "  2. Model is pulled (ollama list)"
+        else
+            log ERROR "LM Studio unavailable: $LM_STUDIO_URL"
+            log ERROR "Make sure:"
+            log ERROR "  1. LM Studio is running"
+            log ERROR "  2. Model is loaded into memory"
+            log ERROR "  3. Server is enabled in Developer tab"
+        fi
         return 1
     fi
 
-    # Get models list (works on macOS and Linux)
-    local models_json=$(curl -s "$LM_STUDIO_URL/models" 2>/dev/null)
+    # Get models list
+    local models_json=$(curl -s "$LLM_URL/models" 2>/dev/null)
     local models=$(echo "$models_json" | sed 's/"id":/\n/g' | grep -v '^$' | sed 's/.*"\([^"]*\)".*/\1/' | grep -v '^data' | tr '\n' ' ')
     log INFO "Available models: $models"
 
     # Check if any model is loaded (use first available)
     if [ -n "$models" ]; then
-        log INFO "LM Studio available"
+        if [ "$LLM_PROVIDER" = "ollama" ]; then
+            log INFO "Ollama available"
+        else
+            log INFO "LM Studio available"
+        fi
         return 0
     fi
 
@@ -143,7 +176,7 @@ validate_input() {
     if [ -z "$1" ]; then
         echo "Usage: $0 <path-to-scan> [options]"
         echo ""
-        echo "Scans directory using skill-scanner + LM Studio"
+        echo "Scans directory using skill-scanner + LM Studio or Ollama"
         echo ""
         echo "Options:"
         echo "  --install    Install skill-scanner if missing"
@@ -151,14 +184,23 @@ validate_input() {
         echo "  --help       Show help"
         echo ""
         echo "Environment variables:"
+        echo "  LLM_PROVIDER       Provider: lm-studio or ollama (default: lm-studio)"
         echo "  LM_STUDIO_URL      LM Studio URL (default: http://localhost:1234/v1)"
-        echo "  MODEL              Model name (default: qwen3-35b-a3b)"
+        echo "  MODEL              LM Studio model (default: qwen3-35b-a3b)"
+        echo "  OLLAMA_URL         Ollama URL (default: http://localhost:11434/v1)"
+        echo "  OLLAMA_MODEL       Ollama model (default: llama3.2)"
         echo "  VENV_PATH          Path to virtual environment"
         echo "  DEBUG=1            Enable debug"
         echo ""
         echo "Examples:"
+        echo "  # LM Studio (default)"
         echo "  $0 ./my-skill"
-        echo "  LM_STUDIO_URL=http://localhost:1234/v1 $0 ./my-skill"
+        echo ""
+        echo "  # Ollama"
+        echo "  LLM_PROVIDER=ollama OLLAMA_MODEL=llama3.2 $0 ./my-skill"
+        echo ""
+        echo "  # Custom LM Studio"
+        echo "  LM_STUDIO_URL=http://192.168.0.12:1234/v1 MODEL=qwen3.5-9b-mlx $0 ./my-skill"
         exit 1
     fi
 }
@@ -196,8 +238,8 @@ main() {
     echo "========================================"
     echo ""
 
-    # Check LM Studio
-    if ! check_lm_studio; then
+    # Check LLM (LM Studio or Ollama)
+    if ! check_llm; then
         if [ "$force_mode" = "false" ]; then
             log WARN "Falling back to quick-scan..."
             "$SCRIPT_DIR/quick-scan.sh" "$target_path"
@@ -221,13 +263,14 @@ main() {
         log INFO "Running skill-scanner..."
 
         # Set environment variables
-        export SKILL_SCANNER_LLM_BASE_URL="$LM_STUDIO_URL"
+        export SKILL_SCANNER_LLM_BASE_URL="$LLM_URL"
         export SKILL_SCANNER_LLM_API_KEY="not-needed"
-        export SKILL_SCANNER_LLM_MODEL="$MODEL"
+        export SKILL_SCANNER_LLM_MODEL="$LLM_MODEL"
         export SKILL_SCANNER_LLM_PROVIDER="openai"
 
         log DEBUG "LLM URL: $SKILL_SCANNER_LLM_BASE_URL"
         log DEBUG "Model: $SKILL_SCANNER_LLM_MODEL"
+        log DEBUG "Provider: $LLM_PROVIDER"
 
         # Run with timeout (cross-platform)
         if command -v timeout &> /dev/null; then
